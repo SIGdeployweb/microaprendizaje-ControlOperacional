@@ -156,6 +156,9 @@
   .opt .key i{font-style:normal;transform:skewX(6deg)}
   .opt.correct{border-color:var(--ok);background:rgba(46,204,113,.14)}
   .opt.correct .key{background:var(--ok);color:#04230d}
+  .opt.sel{border-color:var(--yellow);background:rgba(255,196,0,.12)}
+  .opt.sel .key{background:var(--yellow);color:#1a1200}
+  .hint{display:inline-block;color:var(--yellow);font-size:.8rem;font-weight:600;letter-spacing:.5px;margin-left:4px}
   .opt.wrong{border-color:var(--err);background:rgba(231,76,60,.14);animation:shake .4s}
   .opt.wrong .key{background:var(--err);color:#fff}
   .opt:disabled{cursor:default}
@@ -280,22 +283,26 @@
       <h2>Demuestra lo aprendido</h2>
 
       <div id="quizArea">
-        <p class="question">Las condiciones controladas de operación incluyen:</p>
+        <p class="question">Las condiciones controladas de operación incluyen: <span class="hint">marca las 2 opciones correctas</span></p>
         <div class="opts">
-          <button class="opt" data-ok="1" onclick="answer(this)">
+          <button class="opt" data-k="a" onclick="toggle(this)">
             <span class="key"><i>a</i></span>
             <span>Comunicar con anticipación al personal, tanto variables y límites de control, para asegurar los resultados en planta y registrar sus tendencias.</span>
           </button>
-          <button class="opt" data-ok="0" onclick="answer(this)">
+          <button class="opt" data-k="b" onclick="toggle(this)">
             <span class="key"><i>b</i></span>
             <span>Documentar los procesos para contar con procedimientos o manuales archivados.</span>
           </button>
-          <button class="opt" data-ok="0" onclick="answer(this)">
+          <button class="opt" data-k="c" onclick="toggle(this)">
             <span class="key"><i>c</i></span>
             <span>Generar un reporte de incidencia RDI por cada una de las desviaciones a las condiciones de control establecidas.</span>
           </button>
-          <button class="opt" data-ok="0" onclick="answer(this)">
+          <button class="opt" data-k="d" onclick="toggle(this)">
             <span class="key"><i>d</i></span>
+            <span>Contar con equipos que brinden lecturas de parámetros confiables.</span>
+          </button>
+          <button class="opt" data-k="e" onclick="toggle(this)">
+            <span class="key"><i>e</i></span>
             <span>Todas las anteriores.</span>
           </button>
         </div>
@@ -304,8 +311,8 @@
       <div class="success" id="successBox">
         <div class="big">🎉</div>
         <h3>¡Correcto!</h3>
-        <p>Las condiciones controladas deben <strong>comunicarse con anticipación al personal</strong> (variables y límites de control) para asegurar los resultados en planta.</p>
-        <p>Personal con criterios claros = operación estable = cemento de calidad = energía controlada.</p>
+        <p>Las condiciones controladas requieren <strong>comunicar al personal las variables y límites de control</strong> (a) y <strong>contar con equipos que brinden lecturas confiables</strong> (d).</p>
+        <p>Personal con criterios claros + equipos confiables = operación estable = cemento de calidad = energía controlada.</p>
         <div class="seal"><span>✔ Microaprendizaje completado</span></div>
         <button class="closeBtn" onclick="cerrar()">Cerrar</button>
       </div>
@@ -330,7 +337,7 @@
   <div class="modal">
     <div class="icon">⚠️</div>
     <h3 id="errTitle">Error</h3>
-    <p>Inténtalo de nuevo… Revisa la lámina anterior: la clave está en cómo se asegura el resultado en planta.</p>
+    <p>Inténtalo de nuevo… Recuerda que son 2 las opciones correctas. Revisa la lámina anterior: piensa en cómo se asegura el resultado en planta.</p>
     <button onclick="closeErr()"><span>Reintentar</span></button>
   </div>
 </div>
@@ -344,20 +351,44 @@
   }
 
   let solved = false;
-  function answer(btn){
+  const correctas = ['a', 'd'];   // las dos respuestas correctas
+  const seleccion = new Set();
+
+  function toggle(btn){
     if (solved) return;
-    const ok = btn.dataset.ok === '1';
-    if (ok){
+    const k = btn.dataset.k;
+    if (seleccion.has(k)){
+      seleccion.delete(k);
+      btn.classList.remove('sel');
+    } else {
+      seleccion.add(k);
+      btn.classList.add('sel');
+    }
+    // Se evalúa automáticamente al marcar la segunda opción
+    if (seleccion.size === 2) evaluar();
+  }
+
+  function evaluar(){
+    const elegidas = [...seleccion].sort().join('');
+    if (elegidas === correctas.join('')){      // 'ad'
       solved = true;
-      btn.classList.add('correct');
-      document.querySelectorAll('.opt').forEach(o => o.disabled = true);
+      document.querySelectorAll('.opt').forEach(o => {
+        o.disabled = true;
+        if (correctas.includes(o.dataset.k)){
+          o.classList.remove('sel');
+          o.classList.add('correct');
+        }
+      });
       setTimeout(() => {
         document.getElementById('quizArea').style.display = 'none';
         document.getElementById('successBox').classList.add('show');
         fiesta();
-      }, 600);
+      }, 700);
     } else {
-      btn.classList.add('wrong');
+      document.querySelectorAll('.opt.sel').forEach(o => {
+        o.classList.remove('sel');
+        o.classList.add('wrong');
+      });
       setTimeout(() => document.getElementById('errOverlay').classList.add('show'), 350);
     }
   }
@@ -371,7 +402,8 @@
   }
   function closeErr(){
     document.getElementById('errOverlay').classList.remove('show');
-    document.querySelectorAll('.opt.wrong').forEach(o => o.classList.remove('wrong'));
+    document.querySelectorAll('.opt').forEach(o => o.classList.remove('wrong', 'sel'));
+    seleccion.clear();
   }
 
   // Confeti vanilla — sin librerías, funciona adjunto y sin internet
