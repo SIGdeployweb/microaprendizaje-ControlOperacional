@@ -104,6 +104,18 @@
     transform:skewX(-6deg);
   }
   .params div span{display:inline-flex;align-items:center;gap:8px;transform:skewX(6deg)}
+  .params div.hasTip{cursor:help;border-color:rgba(255,196,0,.85)}
+  .params div.hasTip span{border-bottom:1px dotted rgba(255,233,168,.7)}
+  .tipBox{
+    position:fixed;z-index:80;max-width:300px;
+    background:#1a1d23;border:1px solid var(--yellow);border-radius:10px;
+    padding:12px 14px;color:#f0e6cf;
+    font-family:'Poppins',sans-serif;font-size:.82rem;font-weight:400;line-height:1.5;
+    box-shadow:0 12px 30px rgba(0,0,0,.55);
+    opacity:0;visibility:hidden;transform:translateY(6px);
+    transition:opacity .15s, transform .15s;pointer-events:none;
+  }
+  .tipBox.show{opacity:1;visibility:visible;transform:translateY(0)}
   .params div span::before{
     content:'';width:9px;height:9px;border-radius:50%;
     background:var(--ok);box-shadow:0 0 8px var(--ok);
@@ -275,10 +287,12 @@
       <div class="body">
         <p>El requisito 8.5 se refleja en cómo operamos el proceso bajo <strong>condiciones controladas</strong>. Esto implica trabajar con <strong>parámetros definidos</strong>, usar <strong>instrucciones vigentes</strong> y asegurar que los <strong>equipos funcionen correctamente</strong>.</p>
         <div class="params">
+          <div class="hasTip" data-tip="Factor de Saturación de Cal: parámetro químico fundamental para controlar la calidad de la mezcla cruda en la fabricación de cemento. Mide la proporción de óxido de calcio en relación con el sílice, el aluminio y el hierro para asegurar la formación correcta de los silicatos cálcicos."><span>LSF</span></div>
           <div><span>Temperatura</span></div>
+          <div class="hasTip" data-tip="El C₃S (silicato tricálcico) es el compuesto principal del clínker. Representa entre el 50% y 70% de su composición. Es el motor principal del cemento, responsable de su fraguado rápido y de otorgarle la resistencia mecánica inicial."><span>C₃S</span></div>
           <div><span>Caudal</span></div>
           <div><span>Finura</span></div>
-          <div><span>Consumo energético</span></div>
+          <div class="hasTip" data-tip="kWh/t significa kilovatios-hora por tonelada. Es una métrica industrial utilizada para medir la intensidad energética, es decir, cuánta energía eléctrica se requiere para producir, procesar o transportar una tonelada métrica de un material."><span>Consumo energético</span></div>
           <div><span>Entre otras...</span></div>
         </div>
         <p>Cada ajuste que realizamos debe basarse en <strong>criterios técnicos y experiencia validada</strong>. Así mismo, es clave <strong>registrar las variables críticas, mantener su analítica y la trazabilidad de la operación</strong>.</p>
@@ -355,6 +369,8 @@
   </div>
 </div>
 
+<div class="tipBox" id="tipBox"></div>
+
 <canvas id="confetti"></canvas>
 
 <script>
@@ -363,6 +379,36 @@
     document.getElementById('slide2').classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  // ---- Cuadros emergentes (info al pasar el cursor o tocar) ----
+  (function(){
+    const tip = document.getElementById('tipBox');
+    let activo = null;
+    function mostrar(el){
+      tip.textContent = el.dataset.tip;
+      const r = el.getBoundingClientRect();
+      tip.classList.add('show');
+      const tw = tip.offsetWidth, th = tip.offsetHeight;
+      let left = r.left + r.width / 2 - tw / 2;
+      left = Math.max(10, Math.min(left, window.innerWidth - tw - 10));
+      let top = r.top - th - 10;                 // por defecto, arriba del chip
+      if (top < 10) top = r.bottom + 10;         // si no cabe, debajo
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    }
+    function ocultar(){ tip.classList.remove('show'); activo = null; }
+    document.querySelectorAll('.params div.hasTip').forEach(el => {
+      el.addEventListener('mouseenter', () => mostrar(el));
+      el.addEventListener('mouseleave', ocultar);
+      el.addEventListener('click', (e) => {        // soporte táctil
+        e.stopPropagation();
+        if (activo === el){ ocultar(); }
+        else { activo = el; mostrar(el); }
+      });
+    });
+    document.addEventListener('click', ocultar);
+    window.addEventListener('scroll', ocultar, true);
+  })();
   function volver(){
     document.getElementById('slide2').classList.remove('active');
     document.getElementById('slide1').classList.add('active');
