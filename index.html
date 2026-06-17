@@ -211,6 +211,18 @@
   }
   .closeBtn:hover{color:#fff;border-bottom-color:#9a9a9a}
   .closeBtn:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+  .backBtn{
+    display:inline-block;
+    margin:20px 0 0;
+    background:none;border:none;cursor:pointer;
+    color:#9a9a9a;
+    font-family:'Poppins',sans-serif;font-size:.82rem;font-weight:500;letter-spacing:1px;
+    padding:6px 2px;
+    border-bottom:1px solid transparent;
+    transition:color .2s,border-color .2s;
+  }
+  .backBtn:hover{color:#fff;border-bottom-color:#9a9a9a}
+  .backBtn:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
   .farewell{display:none;text-align:center;padding:60px 30px;animation:fadeIn .5s ease}
   .farewell.show{display:block}
   .farewell h3{font-weight:800;font-size:1.4rem;margin-bottom:8px}
@@ -269,7 +281,7 @@
           <div><span>Consumo energético</span></div>
           <div><span>Entre otras...</span></div>
         </div>
-        <p>Cada ajuste que realizamos debe basarse en <strong>criterios técnicos y experiencia validada</strong>. Así mismo, es clave <strong>registrar las tendencias de las variables críticas</strong> y mantener la <strong>trazabilidad</strong> de la operación.</p>
+        <p>Cada ajuste que realizamos debe basarse en <strong>criterios técnicos y experiencia validada</strong>. Así mismo, es clave <strong>registrar las variables críticas, mantener su analítica y la trazabilidad de la operación</strong>.</p>
         <div class="takeaway">
           Una operación estable no solo mejora la calidad del cemento: reduce reprocesos, consumo energético y riesgos operativos.
         </div>
@@ -287,7 +299,7 @@
         <div class="opts">
           <button class="opt" data-k="a" onclick="toggle(this)">
             <span class="key"><i>a</i></span>
-            <span>Comunicar con anticipación al personal, tanto variables y límites de control, para asegurar los resultados en planta y registrar sus tendencias.</span>
+            <span>Comunicar con anticipación al personal, tanto variables y límites de control, para asegurar los resultados en planta, registrar y analizar sus tendencias.</span>
           </button>
           <button class="opt" data-k="b" onclick="toggle(this)">
             <span class="key"><i>b</i></span>
@@ -299,20 +311,19 @@
           </button>
           <button class="opt" data-k="d" onclick="toggle(this)">
             <span class="key"><i>d</i></span>
-            <span>Contar con equipos que brinden lecturas de parámetros confiables.</span>
+            <span>Contar con equipos que brinden confiabilidad.</span>
           </button>
           <button class="opt" data-k="e" onclick="toggle(this)">
             <span class="key"><i>e</i></span>
             <span>Todas las anteriores.</span>
           </button>
         </div>
+        <button class="backBtn" onclick="volver()">← Volver al contenido</button>
       </div>
-
-      <div class="success" id="successBox">
         <div class="big">🎉</div>
         <h3>¡Correcto!</h3>
-        <p>Las condiciones controladas requieren <strong>comunicar al personal las variables y límites de control</strong> (a) y <strong>contar con equipos que brinden lecturas confiables</strong> (d).</p>
-        <p>Personal con criterios claros + equipos confiables = operación estable = cemento de calidad = energía controlada.</p>
+        <p>Las condiciones controladas requieren <strong>comunicar al personal las variables y límites de control</strong> (a) y <strong>contar con equipos que brinden confiabilidad</strong> (d).</p>
+        <p>Personal con criterios claros + mediciones confiables = operación estable = cemento de calidad = energía controlada.</p>
         <div class="seal"><span>✔ Microaprendizaje completado</span></div>
         <button class="closeBtn" onclick="cerrar()">Cerrar</button>
       </div>
@@ -348,6 +359,13 @@
   function goQuiz(){
     document.getElementById('slide1').classList.remove('active');
     document.getElementById('slide2').classList.add('active');
+  }
+  function volver(){
+    document.getElementById('slide2').classList.remove('active');
+    document.getElementById('slide1').classList.add('active');
+    // Limpia cualquier selección marcada al regresar
+    document.querySelectorAll('.opt').forEach(o => o.classList.remove('sel', 'wrong'));
+    seleccion.clear();
   }
 
   let solved = false;
